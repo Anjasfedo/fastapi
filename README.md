@@ -9,3 +9,5 @@ install fastapi full
 
 run fastapi server
 `uvicorn main:app --reload`
+
+`uvicorn app.main:app --reload`

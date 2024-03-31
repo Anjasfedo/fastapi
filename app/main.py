@@ -1,8 +1,24 @@
 from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.params import Body
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
+
+while True:
+    try:
+        conn = psycopg2.connect(host="localhost", database="fastapi",
+                                user="postgres", password="", cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+
+        print("Database connected")
+        break
+    except Exception as error:
+        print("Connection failed")
+        print("error: ", error)
+        time.sleep(2)
+
 
 app = FastAPI()
 
@@ -39,18 +55,8 @@ def get_posts():
     return {"data": MY_POSTS}
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post):
-    new_post = post.model_dump()
-    new_post["id"] = randrange(0, 10000)
-
-    MY_POSTS.append(new_post)
-
-    return {"data": new_post}
-
-
 @app.get("/posts/latest")
-def get_post():
+def get_latest_post():
     post = MY_POSTS[len(MY_POSTS) - 1]
     return {"data": post}
 
@@ -59,11 +65,19 @@ def get_post():
 def get_post(id: int, response: Response):
     post = find_post(id)
     if not post:
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return {"message": f"post with id {id} not found"}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} not found")
     return {"data": post}
+
+
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_post(post: Post):
+    new_post = post.model_dump()
+    new_post["id"] = randrange(0, 10000)
+
+    MY_POSTS.append(new_post)
+
+    return {"data": new_post}
 
 
 @app.put("/posts/{id}")
