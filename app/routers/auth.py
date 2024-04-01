@@ -4,6 +4,7 @@ from ..koneksi import connect_db
 from ..schemas import UserLogin
 from .. import models
 from ..utils import verify_password
+from ..oauth2 import create_access_token
 
 router = APIRouter(tags=["Authentication"])
 
@@ -20,5 +21,7 @@ def login(user_crendentials: UserLogin, db: Session = Depends(connect_db)):
     if not verify_password(user_crendentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Invalid Credentials")
+        
+    access_token = create_access_token(data={"user_id": user.id})
 
-    return {"token": "example_token"}
+    return {"access_token": access_token, "token_type": "bearer"}
