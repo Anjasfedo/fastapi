@@ -5,10 +5,10 @@ from ..schemas import UserCreate, UserResponse
 from .. import models
 from ..utils import hash_password
 
-router = APIRouter()
+router = APIRouter(prefix="/users")
 
 
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(connect_db)):
     check_user = db.query(models.User).filter(models.User.email == user.email)
 
@@ -28,7 +28,7 @@ def create_user(user: UserCreate, db: Session = Depends(connect_db)):
     return created_user
 
 
-@router.get("/users/{id}", response_model=UserResponse)
+@router.get("/{id}", response_model=UserResponse)
 def get_user(id: int, db: Session = Depends(connect_db)):
     user = db.query(models.User).get(id)
 

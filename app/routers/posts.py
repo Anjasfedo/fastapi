@@ -5,24 +5,24 @@ from ..koneksi import connect_db
 from ..schemas import PostCreate, PostResponse
 from .. import models
 
-router = APIRouter()
+router = APIRouter(prefix="/posts")
 
 
-@router.get("/posts", response_model=List[PostResponse])
+@router.get("/", response_model=List[PostResponse])
 def get_posts(db: Session = Depends(connect_db)):
     posts = db.query(models.Post).all()
 
     return posts
 
 
-@router.get("/posts/latest", response_model=PostResponse)
+@router.get("/latest", response_model=PostResponse)
 def get_latest_post(db: Session = Depends(connect_db)):
     post = db.query(models.Post).order_by(models.Post.id.desc()).first()
 
     return post
 
 
-@router.get("/posts/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostResponse)
 def get_post(id: int, db: Session = Depends(connect_db)):
     post = db.query(models.Post).get(id)
 
@@ -33,7 +33,7 @@ def get_post(id: int, db: Session = Depends(connect_db)):
     return post
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
 def create_post(post: PostCreate, db: Session = Depends(connect_db)):
     created_post = models.Post(**post.model_dump())
 
@@ -45,7 +45,7 @@ def create_post(post: PostCreate, db: Session = Depends(connect_db)):
     return created_post
 
 
-@router.put("/posts/{id}", response_model=PostResponse)
+@router.put("/{id}", response_model=PostResponse)
 def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
     post_query = db.query(models.Post).filter(
         models.Post.id == id).one_or_none()
@@ -65,7 +65,7 @@ def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
     return post_query
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(connect_db)):
     post = db.query(models.Post).filter(models.Post.id == id)
 
