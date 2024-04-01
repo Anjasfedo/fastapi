@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
+from typing import List
 from .koneksi import engine, connect_db
-from .schemas import PostCreate
+from .schemas import PostCreate, PostResponse
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -14,21 +15,21 @@ def root():
     return {"message": "Hewroo worldo"}
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[PostResponse])
 def get_posts(db: Session = Depends(connect_db)):
     posts = db.query(models.Post).all()
 
-    return {"data": posts}
+    return posts
 
 
-@app.get("/posts/latest")
+@app.get("/posts/latest", response_model=PostResponse)
 def get_latest_post(db: Session = Depends(connect_db)):
     post = db.query(models.Post).order_by(models.Post.id.desc()).first()
 
-    return {"data": post}
+    return post
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=PostResponse)
 def get_post(id: int, db: Session = Depends(connect_db)):
     post = db.query(models.Post).get(id)
 
@@ -36,10 +37,10 @@ def get_post(id: int, db: Session = Depends(connect_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} not found")
 
-    return {"data": post}
+    return post
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
 def create_post(post: PostCreate, db: Session = Depends(connect_db)):
     created_post = models.Post(**post.model_dump())
 
@@ -48,10 +49,10 @@ def create_post(post: PostCreate, db: Session = Depends(connect_db)):
 
     db.refresh(created_post)
 
-    return {"data": created_post}
+    return created_post
 
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=PostResponse)
 def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
     post_query = db.query(models.Post).filter(
         models.Post.id == id).one_or_none()
@@ -67,7 +68,7 @@ def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
 
     db.refresh(post_query)
 
-    return {"data": post_query}
+    return post_query
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
