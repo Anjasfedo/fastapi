@@ -1,31 +1,17 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
-from pydantic import BaseModel
-from typing import Optional
-from .koneksi import engine, connect_db
-from . import models
 from sqlalchemy.orm import Session
+from .koneksi import engine, connect_db
+from .schemas import PostCreate
+from . import models
 
 models.Base.metadata.create_all(bind=engine)
 
-
 app = FastAPI()
-
-
-class Post(BaseModel):
-    id: Optional[int] = None
-    title: str
-    content: str
-    is_publish: bool = False
 
 
 @app.get("/")
 def root():
     return {"message": "Hewroo worldo"}
-
-
-# @app.get("/sqlalchemy")
-# def test_posts(db: Session = Depends(connect_db)):
-#     return {"status": "succeed"}
 
 
 @app.get("/posts")
@@ -54,7 +40,7 @@ def get_post(id: int, db: Session = Depends(connect_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(connect_db)):
+def create_post(post: PostCreate, db: Session = Depends(connect_db)):
     created_post = models.Post(**post.model_dump())
 
     db.add(created_post)
@@ -66,7 +52,7 @@ def create_post(post: Post, db: Session = Depends(connect_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(connect_db)):
+def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
     post_query = db.query(models.Post).filter(
         models.Post.id == id).one_or_none()
 
@@ -74,7 +60,7 @@ def update_post(id: int, post: Post, db: Session = Depends(connect_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} not found")
 
-    for attr, value in post.dict().items():
+    for attr, value in post.model_dump().items():
         if attr != 'id':  # Skip updating the id column
             setattr(post_query, attr, value)
     db.commit()
