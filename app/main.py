@@ -65,6 +65,7 @@ def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db)):
     for attr, value in post.model_dump().items():
         if attr != 'id':  # Skip updating the id column
             setattr(post_query, attr, value)
+    
     db.commit()
 
     db.refresh(post_query)
@@ -104,3 +105,14 @@ def create_user(user: UserCreate, db: Session = Depends(connect_db)):
     db.refresh(created_user)
 
     return created_user
+
+
+@app.get("/users/{id}", response_model=UserResponse)
+def get_user(id: int, db: Session = Depends(connect_db)):
+    user = db.query(models.User).get(id)
+
+    if user == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"user with id {id} not found")
+        
+    return user
