@@ -1,12 +1,10 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from passlib.context import CryptContext
 from .koneksi import engine, connect_db
 from .schemas import PostCreate, PostResponse, UserCreate, UserResponse
 from . import models
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from .utils import hash_password
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -96,7 +94,7 @@ def create_user(user: UserCreate, db: Session = Depends(connect_db)):
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
                             detail=f"user with email {user.email} already exists")
         
-    user.password = pwd_context.hash(user.password)
+    user.password = hash_password(user.password)
 
     created_user = models.User(**user.model_dump())
 
