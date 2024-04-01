@@ -5,7 +5,7 @@ from ..koneksi import connect_db
 from ..schemas import PostCreate, PostResponse
 from .. import models
 
-router = APIRouter(prefix="/posts")
+router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 @router.get("/", response_model=List[PostResponse])
