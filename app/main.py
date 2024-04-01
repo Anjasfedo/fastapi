@@ -1,98 +1,16 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends
-from pydantic import BaseModel
-from typing import Optional
-from .koneksi import engine, connect_db
+from fastapi import FastAPI
+from .koneksi import engine
 from . import models
-from sqlalchemy.orm import Session
+from .routers import posts, users, auth
 
 models.Base.metadata.create_all(bind=engine)
 
-
 app = FastAPI()
 
-
-class Post(BaseModel):
-    id: Optional[int] = None
-    title: str
-    content: str
-    is_publish: bool = False
-
+app.include_router(posts.router)
+app.include_router(users.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
     return {"message": "Hewroo worldo"}
-
-
-# @app.get("/sqlalchemy")
-# def test_posts(db: Session = Depends(connect_db)):
-#     return {"status": "succeed"}
-
-
-@app.get("/posts")
-def get_posts(db: Session = Depends(connect_db)):
-    posts = db.query(models.Post).all()
-
-    return {"data": posts}
-
-
-@app.get("/posts/latest")
-def get_latest_post(db: Session = Depends(connect_db)):
-    post = db.query(models.Post).order_by(models.Post.id.desc()).first()
-
-    return {"data": post}
-
-
-@app.get("/posts/{id}")
-def get_post(id: int, db: Session = Depends(connect_db)):
-    post = db.query(models.Post).get(id)
-
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id {id} not found")
-
-    return {"data": post}
-
-
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(connect_db)):
-    created_post = models.Post(**post.model_dump())
-
-    db.add(created_post)
-    db.commit()
-
-    db.refresh(created_post)
-
-    return {"data": created_post}
-
-
-@app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(connect_db)):
-    post_query = db.query(models.Post).filter(
-        models.Post.id == id).one_or_none()
-
-    if post_query == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id {id} not found")
-
-    for attr, value in post.dict().items():
-        if attr != 'id':  # Skip updating the id column
-            setattr(post_query, attr, value)
-    db.commit()
-
-    db.refresh(post_query)
-
-    return {"data": post_query}
-
-
-@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(connect_db)):
-    post = db.query(models.Post).filter(models.Post.id == id)
-
-    if post.first() == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id {id} not found")
-
-    post.delete(synchronize_session=False)
-    db.commit()
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)

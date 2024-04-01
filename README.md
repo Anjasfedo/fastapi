@@ -11,3 +11,8 @@ run fastapi server
 `uvicorn main:app --reload`
 
 `uvicorn app.main:app --reload`
+
+create hex random number on bash for secret key
+`openssl rand -hex 32`
+
+**Note:** 1. deprecated bycrypt
