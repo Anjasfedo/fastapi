@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from .koneksi import engine, connect_db
-from .schemas import PostCreate, PostResponse
+from .schemas import PostCreate, PostResponse, UserCreate, UserResponse
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -83,3 +83,21 @@ def delete_post(id: int, db: Session = Depends(connect_db)):
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+def create_user(user: UserCreate, db: Session = Depends(connect_db)):
+    check_user = db.query(models.User).filter(models.User.email == user.email)
+    
+    if check_user.first() != None:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                            detail=f"user with email {user.email} already exists")
+
+    created_user = models.User(**user.model_dump())
+
+    db.add(created_user)
+    db.commit()
+
+    db.refresh(created_user)
+
+    return created_user
