@@ -1,7 +1,7 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from ..koneksi import connect_db
-from ..schemas import UserCreate, UserResponse
+from ..schemas import UserCreate, UserResponse, CurrentUser
 from .. import models
 from ..utils import hash_password
 from ..oauth2 import get_current_user
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(connect_db), get_current_user: int = Depends(get_current_user)):
+def create_user(user: UserCreate, db: Session = Depends(connect_db)):
     check_user = db.query(models.User).filter(models.User.email == user.email)
 
     if check_user.first() != None:
@@ -30,7 +30,7 @@ def create_user(user: UserCreate, db: Session = Depends(connect_db), get_current
 
 
 @router.get("/{id}", response_model=UserResponse)
-def get_user(id: int, db: Session = Depends(connect_db)):
+def get_user(id: int, db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
     user = db.query(models.User).get(id)
 
     if user == None:
