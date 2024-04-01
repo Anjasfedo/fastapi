@@ -16,11 +16,11 @@ def login(user_crendentials: OAuth2PasswordRequestForm = Depends(), db: Session 
                                         user_crendentials.username).one_or_none()
 
     if user == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Invalid Credentials")
 
     if not verify_password(user_crendentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Invalid Credentials")
 
     access_token = create_access_token(data={"user_id": user.id})
