@@ -12,10 +12,10 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 @router.get("/", response_model=List[PostResponse])
 def get_posts(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
     
-    print(current_user.email)
+    # posts = db.query(models.Post).filter(models.Post.user_id == current_user.id) # Return Post with id same as logged users
     
     posts = db.query(models.Post).all()
-
+    
     return posts
 
 
