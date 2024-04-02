@@ -10,6 +10,15 @@ from typing import Optional
 #     is_publish: bool = False
 
 
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+    # class config:
+    #     orm_mode = True
+
+
 class PostBase(BaseModel):
     title: str
     content: str
@@ -24,6 +33,7 @@ class PostResponse(PostBase):
     id: int
     created_at: datetime
     user_id: int
+    user: UserResponse
 
     # class config:
     #     orm_mode = True
@@ -32,15 +42,6 @@ class PostResponse(PostBase):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-
-
-class UserResponse(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
-
-    # class config:
-    #     orm_mode = True
 
 
 class CurrentUser():
