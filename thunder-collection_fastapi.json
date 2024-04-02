@@ -1,0 +1,90 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "fastapi",
+    "dateExported": "2024-04-02T15:07:20.394Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "f7aaadd3-4b75-4d5d-a0c7-ea931c59a2ba",
+            "colId": "cbc01375-97de-432b-b2b1-7c056fb45a75",
+            "containerId": "",
+            "name": "http://localhost:8000/login/",
+            "url": "http://{{URL}}/login/",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-04-01T15:40:02.829Z",
+            "modified": "2024-04-02T15:06:34.532Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "anjas@email.com"
+                    },
+                    {
+                        "name": "password",
+                        "value": "lorem"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "set-env-var",
+                    "custom": "json.access_token",
+                    "action": "setto",
+                    "value": "{{TOKEN}}"
+                }
+            ]
+        },
+        {
+            "_id": "a31b0f79-e64e-48fb-8efb-877e753e6b01",
+            "colId": "cbc01375-97de-432b-b2b1-7c056fb45a75",
+            "containerId": "",
+            "name": "http://localhost:8000/posts/",
+            "url": "http://{{URL}}/posts/",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-04-01T15:40:15.629Z",
+            "modified": "2024-04-02T15:06:56.261Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"title\": \"asdasd123213\",\n    \"content\": \"2131\",\n    \"is_publish\": true\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "{{TOKEN}}"
+            },
+            "tests": []
+        },
+        {
+            "_id": "14bdbbe4-2a90-462b-add3-a922d7859c0d",
+            "colId": "cbc01375-97de-432b-b2b1-7c056fb45a75",
+            "containerId": "",
+            "name": "http://localhost:8000/",
+            "url": "http://{{URL}}/users/14",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-04-01T15:40:27.653Z",
+            "modified": "2024-04-02T15:07:03.903Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\": \"asdas123\",\n  \"content\": \"12312z3z123z\",\n  \"is_publish\": false\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "{{TOKEN}}"
+            },
+            "tests": []
+        }
+    ]
+}
