@@ -1,0 +1,16 @@
+{
+    "client": "Thunder Client",
+    "environmentName": "fastapi",
+    "dateExported": "2024-04-02T15:07:40.732Z",
+    "version": "1.0",
+    "variables": [
+        {
+            "name": "URL",
+            "value": "localhost:8000"
+        },
+        {
+            "name": "TOKEN",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiZXhwIjoxNzEyMDcyMTk0fQ.kq2bDoVL8nhCZMBaDToCLDxNZgKpkiTSL3d1JYVy-p0"
+        }
+    ]
+}

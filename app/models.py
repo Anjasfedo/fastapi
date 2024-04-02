@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, Boolean
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 from .koneksi import Base
@@ -13,6 +14,10 @@ class Post(Base):
     is_publish = Column(Boolean, server_default="False")
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text("NOW()"))
+    
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    
+    user = relationship("User")
 
 
 class User(Base):
