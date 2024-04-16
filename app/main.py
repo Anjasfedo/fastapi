@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .koneksi import engine
 from . import models
 from .routers import posts, users, auth
+from .config import settings
 
 models.Base.metadata.create_all(bind=engine)
 
