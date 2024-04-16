@@ -10,12 +10,13 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 @router.get("/", response_model=List[PostResponse])
-def get_posts(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user), limit: int = 10, skip:int = 0, search: Optional[str] = ""):
-    
+def get_posts(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+
     # posts = db.query(models.Post).filter(models.Post.user_id == current_user.id) # Return Post with id same as logged users
 
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    
+    posts = db.query(models.Post).filter(
+        models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
     return posts
 
 
@@ -57,9 +58,10 @@ def update_post(id: int, post: PostCreate, db: Session = Depends(connect_db), cu
     if post_query == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} not found")
-        
+
     if post_query.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not Authorized to perform action")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Not Authorized to perform action")
 
     for attr, value in post.model_dump().items():
         if attr != 'id':  # Skip updating the id column
@@ -81,9 +83,10 @@ def delete_post(id: int, db: Session = Depends(connect_db), current_user: Curren
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} not found")
-        
+
     if post.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not Authorized to perform action")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Not Authorized to perform action")
 
     post_query.delete(synchronize_session=False)
     db.commit()

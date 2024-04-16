@@ -14,9 +14,10 @@ class Post(Base):
     is_publish = Column(Boolean, server_default="False")
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text("NOW()"))
-    
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    
+
+    user_id = Column(Integer, ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+
     user = relationship("User")
 
 
@@ -28,3 +29,12 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text("NOW()"))
+
+
+class Vote(Base):
+    __tablename__ = "votes"
+
+    post_id = Column(Integer, ForeignKey(
+        "posts.id", ondelete="CASCADE"), primary_key=True)
+    user_id = Column(Integer, ForeignKey(
+        "users.id", ondelete="CASCADE"), primary_key=True)
