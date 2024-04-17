@@ -22,21 +22,27 @@ def get_posts(db: Session = Depends(connect_db), current_user: CurrentUser = Dep
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(
         models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-    posts = list ( map (lambda x : x._mapping, posts) )
+    posts = list(map(lambda x: x._mapping, posts))
 
     return posts
 
 
-@router.get("/latest", response_model=PostResponse)
+@router.get("/latest", response_model=PostOut)
 def get_latest_post(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
-    post = db.query(models.Post).order_by(models.Post.id.desc()).first()
+    # post = db.query(models.Post).order_by(models.Post.id.desc()).first()
+
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).order_by(models.Post.id.desc()).first()
 
     return post
 
 
-@router.get("/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostOut)
 def get_post(id: int, db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
-    post = db.query(models.Post).get(id)
+    # post = db.query(models.Post).get(id)
+
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
