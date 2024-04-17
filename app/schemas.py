@@ -38,6 +38,10 @@ class PostResponse(PostBase):
 
     # class config:
     #     orm_mode = True
+    
+class PostOut(BaseModel):
+    Post: PostResponse
+    votes: int
 
 
 class UserCreate(BaseModel):
