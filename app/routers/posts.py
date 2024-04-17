@@ -1,35 +1,48 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..koneksi import connect_db
-from ..schemas import PostCreate, PostResponse, CurrentUser
+from ..schemas import PostCreate, PostResponse, CurrentUser, PostOut
 from .. import models
 from ..oauth2 import get_current_user
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-@router.get("/", response_model=List[PostResponse])
+@router.get("/", response_model=List[PostOut])
 def get_posts(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 
     # posts = db.query(models.Post).filter(models.Post.user_id == current_user.id) # Return Post with id same as logged users
 
-    posts = db.query(models.Post).filter(
+    # posts = db.query(models.Post).filter(
+    #     models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(
         models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    posts = list(map(lambda x: x._mapping, posts))
 
     return posts
 
 
-@router.get("/latest", response_model=PostResponse)
+@router.get("/latest", response_model=PostOut)
 def get_latest_post(db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
-    post = db.query(models.Post).order_by(models.Post.id.desc()).first()
+    # post = db.query(models.Post).order_by(models.Post.id.desc()).first()
+
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).order_by(models.Post.id.desc()).first()
 
     return post
 
 
-@router.get("/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostOut)
 def get_post(id: int, db: Session = Depends(connect_db), current_user: CurrentUser = Depends(get_current_user)):
-    post = db.query(models.Post).get(id)
+    # post = db.query(models.Post).get(id)
+
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
