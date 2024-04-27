@@ -22,7 +22,7 @@ Make migration on database with revision
 `alembic revision -m [message]`
 
 Run the migration
-`alembic upgrade [upgrade revision number]`
+`alembic upgrade [revision number]`
 
 Upgrade by step
 `alembic upgrade [+n step]`
@@ -37,9 +37,12 @@ Run updated revision
 `alembic upgrade head`
 
 Rollback with revision
-`alembic downgrade [downgrade revision number]`
+`alembic downgrade [revision number]`
 
 Rollback by step
 `alembic downgrade [-n step]`
+
+Auto create revision from model
+`alembic revision --autogenerate -m [message]`
 
 **Note:** 1. deprecated bycrypt
