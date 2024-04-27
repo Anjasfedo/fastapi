@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.koneksi import Base
-from app.config import settings
+from app.models import Base # ! Not from koneksi
+from app.config import settings # !
 
 SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{settings.database_username}:{
     settings.database_password}/@{settings.database_host}:{settings.database_port}/{settings.database_name}"

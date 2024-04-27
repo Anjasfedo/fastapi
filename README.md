@@ -18,4 +18,10 @@ create hex random number on bash for secret key
 Initialize alembic
 `alembic init [folder name]`
 
+Make migration on database with revision
+`alembic revision -m [message]`
+
+Run the migration
+`alembic upgrade [revision number]`
+
 **Note:** 1. deprecated bycrypt
