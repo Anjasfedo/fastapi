@@ -22,6 +22,21 @@ Make migration on database with revision
 `alembic revision -m [message]`
 
 Run the migration
-`alembic upgrade [revision number]`
+`alembic upgrade [upgrade revision number]`
+
+Show current revision
+`alembic current`
+
+Show updated revision
+`alembic head`
+
+Run updated revision
+`alembic upgrade head`
+
+Rollback with revision
+`alembic downgrade [downgrade revision number]`
+
+Rollback by step
+`alembic downgrade [-n step]`
 
 **Note:** 1. deprecated bycrypt
