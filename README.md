@@ -24,6 +24,9 @@ Make migration on database with revision
 Run the migration
 `alembic upgrade [upgrade revision number]`
 
+Upgrade by step
+`alembic upgrade [+n step]`
+
 Show current revision
 `alembic current`
 
