@@ -4,7 +4,7 @@ from . import models
 from .routers import posts, users, auths, votes
 from .config import settings
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine) # ! Disable SQLAlchemy Create Engine
 
 app = FastAPI()
 
